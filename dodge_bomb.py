@@ -44,6 +44,7 @@ def main():
     vx, vy = +5, +5
 
     bb_imgs, bb_accs = init_bb_imgs()
+    kk_imgs = get_kk_imgs()
 
     clock = pg.time.Clock()
     tmr = 0
@@ -66,6 +67,7 @@ def main():
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
+
         for key, mv in DELTA.items():
             if key_lst[key]:
                 sum_mv[0] += mv[0]
@@ -90,6 +92,7 @@ def main():
         if not tate:
             vy *= -1
 
+        kk_img = kk_imgs[tuple(sum_mv)]
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
@@ -108,7 +111,8 @@ def gameover(screen: pg.Surface) -> None:
     screen.blit(kk_img, (WIDTH//2 - kk_img.get_width()//2+200, HEIGHT//2 - kk_img.get_height()//2))
     pg.display.update()
     time.sleep(5)
-    
+
+
 def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     bb_imgs = []
     for r in range(1,11):
@@ -118,6 +122,23 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
         bb_imgs.append(bb_img)
     bb_accs = [a for a in range(1, 11)]
     return bb_imgs, bb_accs
+
+
+def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
+    kk_flip = pg.transform.flip(pg.image.load("fig/3.png"), True, False)
+    kk_dict ={
+        (0, 0):pg.transform.rotozoom(kk_flip, -0, 0.9),  #デフォ
+        (+5, 0):pg.transform.rotozoom(kk_flip, 0, 0.9),  #右
+        (+5, -5):pg.transform.rotozoom(kk_flip, 45, 0.9),  #右上
+        (0, -5):pg.transform.rotozoom(kk_flip, 90, 0.9),  #上
+        (-5, -5):pg.transform.rotozoom(pg.image.load("fig/3.png"), -45, 0.9),  #左上
+        (-5, 0):pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9),  #左
+        (-5, +5):pg.transform.rotozoom(pg.image.load("fig/3.png"), 45, 0.9),  #左下
+        (0, +5):pg.transform.rotozoom(kk_flip, -90, 0.9),  #下
+        (+5, +5):pg.transform.rotozoom(kk_flip, -45, 0.9),  #右下
+    }
+    return kk_dict
+
 
 if __name__ == "__main__":
     pg.init()
